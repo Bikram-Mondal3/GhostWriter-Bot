@@ -30,14 +30,18 @@ load_dotenv()
 GITHUB_APP_ID = os.getenv("GITHUB_APP_ID")
 WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
 
-# Load private key
-try:
-    with open("private-key.pem", "r") as f:
-        GITHUB_PRIVATE_KEY = f.read()
-except FileNotFoundError:
-    print("❌ ERROR: private-key.pem not found!")
-    print("Please ensure the GitHub App private key is in the same directory.")
-    raise
+# Load private key from environment variable or file
+GITHUB_PRIVATE_KEY = os.getenv("GITHUB_PRIVATE_KEY")
+
+if not GITHUB_PRIVATE_KEY:
+    # Fallback to file for local development
+    try:
+        with open("private-key.pem", "r") as f:
+            GITHUB_PRIVATE_KEY = f.read()
+    except FileNotFoundError:
+        print("❌ ERROR: private-key.pem not found and GITHUB_PRIVATE_KEY env var not set!")
+        print("Please ensure the GitHub App private key is available.")
+        raise
 
 app = FastAPI(
     title="DevOps-GhostWriter",
